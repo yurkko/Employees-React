@@ -38,6 +38,7 @@ class App extends Component {
 				},
 			],
 			term: "",
+			filterStatus: "all",
 		};
 		this.maxId = 4;
 	}
@@ -80,12 +81,13 @@ class App extends Component {
 		}));
 	};
 
-	searchEmp = (items, term) => {
+	//
+	searchEmp = (data, term) => {
 		if (term.length === 0) {
-			return items;
+			return data;
 		}
 
-		return items.filter((item) => {
+		return data.filter((item) => {
 			return item.name.indexOf(term) > -1;
 		});
 	};
@@ -96,28 +98,47 @@ class App extends Component {
 		});
 	};
 
+	//
+	filterData = (data, filterStatus) => {
+		switch (filterStatus) {
+			case "rise":
+				return data.filter((item) => item.rise);
+			case "moreThan1000":
+				return data.filter((item) => item.salary > 1000);
+			default:
+				return data;
+		}
+	};
+
+	onUpdateFilterStatus = (status) => {
+		this.setState({
+			filterStatus: status,
+		});
+	};
+
 	//Render
 
 	render() {
-		const { data, term } = this.state;
+		const { data, term, filterStatus } = this.state;
 		const employees = data.length;
 		const increased = data.filter((item) => item.increase).length;
-		const visibleData = this.searchEmp(data, term);
+		const visibleData = this.filterData(this.searchEmp(data, term), filterStatus);
 
 		return (
 			<div className="app">
 				<AppInfo employees={employees} increased={increased} />
-
 				<div className="search-panel">
 					<SearchPanel onUpdateSearch={this.onUpdateSearch} />
-					<AppFilter />
+					<AppFilter
+						onUpdateFilterStatus={this.onUpdateFilterStatus}
+						filter={filterStatus}
+					/>
 				</div>
 				<EmployersList
-					data={visibleData} // Передайте дані у властивість data
+					data={visibleData} // Передайте відфільтровані дані у властивість data
 					onDelete={this.deleteItem}
 					onToggleProp={this.onToggleProp}
 				/>
-
 				<EmployersAddform onAdd={this.addItem} />
 			</div>
 		);
