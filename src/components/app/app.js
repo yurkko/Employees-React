@@ -45,6 +45,19 @@ class App extends Component {
 
 	// Method
 
+	componentDidMount() {
+		const localStorageData = localStorage.getItem("data");
+		if (localStorageData) {
+			this.setState({ data: JSON.parse(localStorageData) });
+		}
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		if (prevState.data !== this.state.data) {
+			localStorage.setItem("data", JSON.stringify(this.state.data));
+		}
+	}
+
 	deleteItem = (id) => {
 		this.setState(({ data }) => {
 			return {
@@ -86,7 +99,6 @@ class App extends Component {
 		if (term.length === 0) {
 			return data;
 		}
-
 		return data.filter((item) => {
 			return item.name.indexOf(term) > -1;
 		});
@@ -135,7 +147,7 @@ class App extends Component {
 					/>
 				</div>
 				<EmployersList
-					data={visibleData} // Передайте відфільтровані дані у властивість data
+					data={visibleData}
 					onDelete={this.deleteItem}
 					onToggleProp={this.onToggleProp}
 				/>
